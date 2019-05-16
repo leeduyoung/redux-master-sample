@@ -1,0 +1,227 @@
+<!-- 모듈화 후 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.1/redux.min.js"></script>
+    <style>
+    
+    </style>
+</head>
+<body>
+    <div id="subject"></div>
+    <div id="toc"></div>
+    <div id="control"></div>
+    <div id="content"></div>
+
+    <!-- 재활용성이 높은 모듈로 변경 -->
+    <script>
+        function subject() {
+            document.querySelector('#subject').innerHTML = `
+                <header>
+                    <h1>WEB</h1>
+                    Hello, WEB!
+                </header>
+            `;
+        }
+
+        function TOC() {
+            let state = store.getState();
+            let liTags = '';
+            for (let i = 0; i < state.contents.length; i++) {
+                liTags += `
+                    <li>
+                        <a onclick="event.preventDefault();
+                            store.dispatch({type: 'SELECT', id: ${state.contents[i].id}})" 
+                            href="${state.contents[i].id}">${state.contents[i].title}</a>
+                    </li>
+                `;
+            }
+
+            document.querySelector('#toc').innerHTML = `
+                <nav>
+                    <ol>
+                        ${liTags}
+                    </ol>
+                </nav>
+            `;
+        }
+
+        function control() {
+            document.querySelector('#control').innerHTML = `
+                <ul>
+                    <li>
+                        <a onclick="
+                            event.preventDefault();
+                            store.dispatch({type: 'CHANGE_MODE'});"
+                            href="/create">
+                            create
+                        </a>
+                    </li>
+                    <li>
+                        <input type="button" 
+                            onclick="
+                                store.dispatch({type: 'DELETE'});
+                            " 
+                            value="delete">
+                    </li>
+                </ul>
+            `;
+        }
+
+        function article() {
+            let state = store.getState();
+            
+            if (state.mode === 'read') {
+                document.querySelector('#content').innerHTML = `
+                    <article>
+                        <h2>${state.contents[state.selected_id - 1].title}</h2>
+                        ${state.contents[state.selected_id - 1].desc}
+                    </article>
+                `;
+            }
+            else if (state.mode === 'create') {
+                document.querySelector('#content').innerHTML = `
+                    <article>
+                        <form onsubmit="
+                                event.preventDefault();
+                                store.dispatch({
+                                    type: 'CREATE',
+                                    title: this.title.value,
+                                    desc: this.desc.value
+                                });
+                            ">
+                            <p>
+                                <input type="text" name="title" placeholder="title">
+                            </p>
+                            <p>
+                                <textarea name="desc" placeholder="description"></textarea>
+                            </p>
+                            <p>
+                                <input type="submit">
+                            </p>
+                        </form>
+                    </article>
+                `;                
+            }
+        }
+
+        // redux
+        function reducer(state, action) {
+            console.log(state, action);
+
+            if (state === undefined) {
+                return {
+                    mode: 'read',
+                    selected_id: 1,
+                    contents: [
+                        {
+                            id: 1,
+                            title: 'HTML',
+                            desc: 'HTML is ...'
+                        },
+                        {
+                            id: 2,
+                            title: 'CSS',
+                            desc: 'CSS is ...'
+                        },
+                    ]
+                }
+            }
+
+            if (action.type === 'SELECT') {
+                return {
+                    ...state,
+                    selected_id: action.id
+                }
+            }
+
+            if (action.type === 'CREATE') {
+                let newContents = state.contents.concat();
+                newContents.push({id: newContents.length + 1, title: action.title, desc: action.desc});
+
+                return {
+                    ...state,
+                    mode: 'read',
+                    contents: newContents,
+                    selected_id: newContents.length
+                }
+            }
+
+            if (action.type === 'DELETE') {
+                let newContents = state.contents.concat();
+                newContents.splice(state.selected_id-1,1);
+
+                return {
+                    ...state,
+                    contents: newContents,
+                    selected_id: 1
+                }
+            }
+
+            if (action.type === 'CHANGE_MODE') {
+                let mode = state.mode === 
+                    'create' ? 'read' : 'create';
+
+                return {
+                    ...state,
+                    mode: mode
+                }
+            }
+
+            return state;
+        }
+        var store = Redux.createStore(
+            reducer,
+            window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+        );
+
+        // state가 갱신되면 re render될 컴포넌트 설정
+        store.subscribe(TOC);
+        store.subscribe(article);
+
+        subject();
+        TOC();
+        control();
+        article();
+    </script>
+</body>
+</html>
+
+<!-- 모듈화 전 -->
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.1/redux.min.js"></script>
+    <style>
+    
+    </style>
+</head>
+<body>
+    <header>
+        <h1>WEB</h1>
+        Hello, WEB!
+    </header>
+    <nav>
+        <ol>
+            <li><a href="1.html">HTML</a></li>
+            <li><a href="2.html">CSS</a></li>
+        </ol>
+    </nav>
+    <article>
+        <ul>
+            <li><a href="/create">create</a></li>
+            <li><input type="button" value="delete"></li>
+        </ul>
+        <h2>HTML</h2>
+        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Voluptatum similique voluptates delectus. Fuga mollitia accusamus, laborum commodi cupiditate soluta sint?
+    </article>
+</body>
+</html> -->
