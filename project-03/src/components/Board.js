@@ -133,7 +133,7 @@ let mapStateToProps = (state) => {
     return state.boardReducer;
 };
 
-let mapDispatchToProps = (dispatch, id) => {
+let mapDispatchToProps = (dispatch) => {
     return {
         onSelect(id) {dispatch({type: select, id: id})},
         onCreate() {dispatch({type: create})},
