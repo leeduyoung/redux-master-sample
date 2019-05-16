@@ -14,6 +14,31 @@ const boardReducer = function board(state, action) {
         }
     }
 
+    if (action.type === 'SELECT') {
+        return {
+            ...state,
+            selected_id: action.id
+        }
+    }
+
+    if (action.type === 'DELETE') {
+
+    }
+
+    if (action.type === 'CREATE') {
+
+    }
+
+    if (action.type === 'CHANGE_MODE') {
+        let _mode = (state.mode === 'read')
+            ? 'create' : 'read';
+
+        return {
+            ...state,
+            mode: _mode
+        }
+    }
+
     return state;
 }
 
