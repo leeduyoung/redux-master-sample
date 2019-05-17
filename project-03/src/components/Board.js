@@ -1,12 +1,19 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { select, remove, create, change_mode } from '../actions';
+import { onSelect, onCreate, onChangeMode, onDelete} from '../actions';
 
 class Board extends React.Component {
 
-    render() {
-        // console.log('this.props: ', this.props);
+    constructor(props) {
+        super(props);
 
+        this.state = {
+            title: '',
+            desc: ''
+        };
+    }
+
+    render() {
         return (
             <div className="board-component">
                 {this.subject()}
@@ -84,11 +91,18 @@ class Board extends React.Component {
                 <article>
                     <form onSubmit={this.submitClickHandler.bind(this)}>
                         <p>
-                            <input type="text" name="title" placeholder="title"></input>
+                            <input type="text" 
+                                name="title" 
+                                placeholder="title"
+                                value={this.state.title}
+                                onChange={this.handleInputChange.bind(this)}></input>
                         </p>
 
                         <p>
-                            <textarea name="desc" placeholder="description"></textarea>
+                            <textarea name="desc" 
+                                placeholder="description"
+                                value={this.state.desc}
+                                onChange={this.handleInputChange.bind(this)}></textarea>
                         </p>
 
                         <p>
@@ -113,32 +127,47 @@ class Board extends React.Component {
     }
 
     deleteClickHandler() {
-        console.log("deleteClickHandler");
+        this.props.onDelete();
     }
 
     submitClickHandler(event) {
         event.preventDefault();
-        this.props.onCreate();
+        this.props.onCreate(this.state.title, this.state.desc);
+
+        // INIT DATA
+        this.setState({
+            title: '',
+            desc: ''
+        });
+    }
+
+    handleInputChange(event) {
+        this.setState({
+            [event.target.name]: event.target.value
+        });
     }
 }
 
-/**
- * mapStateToProps
- * : store의 state를 컴포넌트의 props에 매핑한다.
- * 
- * mapDispatchToProps
- * : 컴포넌트의 함수명 props를 실행했을때, 개발자가 지정한 action을 dispatch하도록 실행
- */
-let mapStateToProps = (state) => {
+ /**
+  * mapStateToProps
+  * : store의 state를 컴포넌트의 props에 매핑한다.
+  * @param {*} state 
+  */
+ let mapStateToProps = (state) => {
     return state.boardReducer;
 };
 
+/**
+ * mapDispatchToProps
+ * : 컴포넌트의 함수명 props를 실행했을때, 개발자가 지정한 action을 dispatch하도록 실행
+ * @param {*} dispatch 
+ */
 let mapDispatchToProps = (dispatch) => {
     return {
-        onSelect(id) {dispatch({type: select, id: id})},
-        onCreate() {dispatch({type: create})},
-        onDelete() {dispatch({type: remove})},
-        onChangeMode() {dispatch({type: change_mode})}
+        onSelect: (id) => dispatch(onSelect(id)),
+        onCreate: (title, desc) => dispatch(onCreate(title, desc)),
+        onDelete: () => dispatch(onDelete()),
+        onChangeMode: () => dispatch(onChangeMode())
     }
 };
 
