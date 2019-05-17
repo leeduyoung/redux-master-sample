@@ -24,5 +24,6 @@ React와 Redux를 사용하여 간단한 프로젝트를 만들어봅니다.
 프로젝트는 `create-react-app`을 사용하였습니다.
 
 실행방법
+- npm install
 - npm run build
 - npm run start
