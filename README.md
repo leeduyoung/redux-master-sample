@@ -32,6 +32,10 @@ React와 Redux를 사용하여 간단한 프로젝트를 만들어봅니다.
 Typescript, React, Redux를 사용하여 Project-03 프로젝트를 만들어봅니다.
 Typescript를 사용하여 React, Redux를 사용하는 방법을 알아봅니다.
 
+### Project-05
+순수 Javascript에서 Redux를 사용하여 간단한 프로젝트를 만들어봅니다.
+React와는 별개로 Redux를 사용하는 방법을 알아봅니다.
+
 실행방법
 - npm install
 - npm run dev
